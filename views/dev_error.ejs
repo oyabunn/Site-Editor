@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>エラーです</title>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" media="screen, projection" />
+	<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+	<script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+	<div class="container">
+	<div class="page-header">
+		<h3>うーぷす</h3>
+	</div>
+	  
+	<div id="title"class="text-error">
+		<%= message%>
+	</div>
+	</br>
+	<div>
+		-description-
+	</div>
+	<div id="description"class="text-info">
+		<%if(typeof(description)=="string"){%><%= description%><%}%>
+	</div>
+	</div>
+  </body>
+</html>

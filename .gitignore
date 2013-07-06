@@ -1,0 +1,25 @@
+### NetBeans ###
+
+private.properties
+private.xml
+project.properties
+project.xml
+
+### Node ###
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+pids
+logs
+results
+
+npm-debug.log
+node_modules
+contents
+.elasticbeanstalk/

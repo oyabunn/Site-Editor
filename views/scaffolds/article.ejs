@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>  
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>yuki-sato.com</title>
+		<link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" media="screen, projection">
+		<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+		<script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+	</head>
+<body>
+<div class="container">
+
+<%for(index=0; index<components.length; index++){%>
+<%var component = components[index]%>
+	<%if(component.type==='title'){%>
+		<div class="page-header">
+			<h3><%-component.value%></h3>
+		</div>
+	<%}else if(component.type==='image'){%>
+		<img src="<%-component.value%>" href="<%-component.value%>"/>
+	<%}else{%>
+		<div>
+			<%-component.value%>
+		</div>
+	<%}%>
+<%}%>
+	
+<hr>
+you can use pictures and texts on this site as you like.
+
+</div>
+</body>
+</html>
