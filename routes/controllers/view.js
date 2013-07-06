@@ -10,7 +10,7 @@ exports.view = function(req, res){
 		}
 		var scaffold = _fm.scaffoldFromFileName(filename);
 		var components = _componentsBuilder.build(txt);
-		res.render('scaffolds/'+scaffold , {components: components.components, editmode:false});
+		res.render('scaffolds/'+scaffold , {components: components.components});
 	});
 };
 
@@ -22,6 +22,6 @@ exports.outputView = function(req, res){
 		}
 		var scaffold = _fm.scaffoldFromFileName(filename);
 		var components = _componentsBuilder.build(txt);
-		res.render('scaffolds/'+scaffold , {components: components.components, editmode:false});
+		res.render('scaffolds/'+scaffold , {components: components.components});
 	});
 };

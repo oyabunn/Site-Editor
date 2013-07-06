@@ -10,6 +10,6 @@ exports.showEditView = function(req, res){
 		}
 		var scaffold = _fm.scaffoldFromFileName(filename);
 		var components = _componentsBuilder.build(txt);
-		res.render('scaffolds/'+scaffold , {components: components.components, editmode:true});
+		res.render('editor/'+scaffold , {components: components.components});
 	});
 };

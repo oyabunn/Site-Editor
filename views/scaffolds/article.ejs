@@ -13,7 +13,7 @@
 <%for(index=0; index<components.length; index++){%>
 <%var component = components[index]%>
 	<%if(component.type==='title'){%>
-	<div class="page-header component" <%if(editmode){%>contenteditable=true<%}%>>
+	<div class="page-header component" >
 			<h3><%-component.value%></h3>
 		</div>
 	<%}else if(component.type==='image'){%>
@@ -21,12 +21,11 @@
 			<img src="<%-component.value%>" href="<%-component.value%>"/>
 		</div>
 	<%}else{%>
-		<div class="component" <%if(editmode){%>contenteditable=true<%}%>>
+		<div class="component" >
 			<%-component.value%>
 		</div>
 	<%}%>
 <%}%>
-	
 <hr>
 you can use pictures and texts on this site as you like.
 
