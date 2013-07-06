@@ -1,29 +1,27 @@
 
-var _fs = require('fs');
-var _path = require('path');
 var _componentsBuilder = require('./components.js');
-
-var scaffoldFromFileName = function(filename){
-	var infos = filename.split('_');
-	if(infos.length==0){
-		return 'article';
-	}
-	return infos[0];
-};
+var _fm = require('./fileManager.js');
 
 exports.view = function(req, res){
-	var path = ''+req.params;
-	path = path.replace('.html', '.txt');
-	_fs.readFile(_path.join('./contents',path) , function (err, txtObj){
-		var txt = ''+txtObj;
-		if (err){
+	_fm.getContentsFile(''+req.params, function(err, filename, txt){
+		if(err){
 			res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
 			return;
 		}
-		var fileBaseName = _path.basename(path, '.txt');
-		var scaffold = scaffoldFromFileName(fileBaseName);
-		
+		var scaffold = _fm.scaffoldFromFileName(filename);
 		var components = _componentsBuilder.build(txt);
-		res.render('scaffolds/'+scaffold , {components: components.components});
+		res.render('scaffolds/'+scaffold , {components: components.components, editmode:false});
+	});
+};
+
+exports.outputView = function(req, res){
+	_fm.getContentsFile(''+req.params, function(err, filename, txt){
+		if(err){
+			res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
+			return;
+		}
+		var scaffold = _fm.scaffoldFromFileName(filename);
+		var components = _componentsBuilder.build(txt);
+		res.render('scaffolds/'+scaffold , {components: components.components, editmode:false});
 	});
 };

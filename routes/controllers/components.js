@@ -81,7 +81,7 @@ componentsBuilder.prototype = {
 	},
 	
 	appendStringToLastComponent: function(str){
-		if(this.components.length==0){
+		if(this.components.length==0 || this.components[this.components.length-1].type!=='content'){
 			this.components.push(this.getDefaultComponent());
 		}
 		
@@ -91,7 +91,6 @@ componentsBuilder.prototype = {
 	
 	appendComponentObject: function(newComponent){
 		this.components.push(newComponent);
-		this.components.push(this.getDefaultComponent());
 	}
 	
 };
