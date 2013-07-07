@@ -77,11 +77,30 @@ var addNewImageComponent = function(){
 }
 
 var applyBold = function(){
+	var selection = window.getSelection();
+	var range  = selection.getRangeAt(0);
 	
+	var newNode = document.createElement("b");
+	range.surroundContents(newNode);
 }
 
+var _lastSelectedRange
+
 var applyLink = function(){
+	var selection = window.getSelection();
+	_lastSelectedRange = selection.getRangeAt(0);
+	$("#link-modal").modal("show");
+}
+
+var setLinkToSelection = function(){
+	var url = $("#link-setting-field").val();
+	var range = _lastSelectedRange
 	
+	var newNode = document.createElement("a");
+	newNode.setAttribute("href", ""+url);
+	range.surroundContents(newNode);
+	
+	$("#link-modal").modal("hide");
 }
 
 var saveComponents = function(){
