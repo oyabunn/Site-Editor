@@ -6,49 +6,79 @@
 		<link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" media="screen, projection">
 		<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
 		<script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="/bootstrap/js/article_edit.js"></script>
+		<script type="text/javascript" src="/javascripts/article_edit.js"></script>
+		<script type="text/javascript">
+			var SCPageConfig = <%-JSON.stringify(pageObject.config)%>;
+		</script>
 	</head>
 <body>
 	
+<div id="upload-modal" class="modal hide">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>Add Image</h3>
+	</div>
+	<form id="image-upload-form" action="/upload" method="post" enctype="multipart/form-data">
+		<div>
+			You can upload from your computor.
+		</div>
+		<div>
+			<input type="file" name="uploadimage" />
+		</div>
+		<div>
+			<input type="button" class="btn btn-primary" value="Upload" onClick="uploadImage()"/>
+		</div>
+	</form>
+	<div>
+		Also you can set image url.
+	</div>
+	<div>
+		<input type="text" id="image-url-field"/>
+		<input type="button" class="btn" value="set" onClick="applyNewImageUrl()"/>
+	</div>
+	<hr>
+	<div>
+		<center>
+		<div>you choosed this.</div>
+		<div><img id="choosed-image" src=""/></div>
+		</center>
+	</div>
+	<div class="modal-footer">
+		<a class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+		<input class="btn btn-primary" value="Add This Image" onClick="addNewImageComponent()"></input>
+	</div>
+</div>
+
 <ul class="nav nav-tabs nav-stacked" style="position:fixed; top:50px; right:0px;">
-  <li>
-    <a href="#">Home</a>
-  </li>
   <li>
     <a href="#">Config</a>
   </li>
   <li>
-    <a onclick="javascript:appendComponent('title');">Add Title</a>
+    <a onclick="appendComponent('title')">Add Title</a>
   </li>
   <li>
-    <a onclick="javascript:appendComponent('content');">Add Text</a>
+    <a onclick="appendComponent('content')">Add Text</a>
   </li>
   <li>
-    <a href="#">Add Image</a>
+    <a href="#upload-modal" role="button" data-toggle="modal">Add Image</a>
   </li>
   <li>
-    <a>Save Draft</a>
+    <a onclick="saveComponents()">Just Save</a>
   </li>
   <li>
-    <a onclick="javascript:alert(getComponents());">Save</a>
+    <a onclick="publishComponents()">Publish</a>
   </li>
 </ul>
 	
 <div id="editspace" class="container">
-	<%for(index=0; index<components.length; index++){%>
-	<%var component = components[index]%>
+	<%for(index=0; index<pageObject.components.length; index++){%>
+	<%var component = pageObject.components[index]%>
 		<%if(component.type==='title'){%>
-			<div class="page-header component" contenteditable=true>
-				<h3><%-component.value%></h3>
-			</div>
+			<h3><div class="page-header component component-title" contenteditable=true><%-component.value%></div></h3>
 		<%}else if(component.type==='image'){%>
-			<div>
-				<img src="<%-component.value%>" href="<%-component.value%>"/>
-			</div>
+			<center><img class="component component-image" src="<%-component.value%>" href="<%-component.value%>"/></center>
 		<%}else{%>
-			<div class="component" contenteditable=true>
-				<%-component.value%>
-			</div>
+			<div class="component component-content" contenteditable=true><%-component.value%></div>
 		<%}%>
 	<%}%>
 </div>

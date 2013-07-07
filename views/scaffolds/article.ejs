@@ -9,26 +9,20 @@
 	</head>
 <body>
 <div class="container">
-
-<%for(index=0; index<components.length; index++){%>
-<%var component = components[index]%>
-	<%if(component.type==='title'){%>
-	<div class="page-header component" >
-			<h3><%-component.value%></h3>
-		</div>
-	<%}else if(component.type==='image'){%>
-		<div>
-			<img src="<%-component.value%>" href="<%-component.value%>"/>
-		</div>
-	<%}else{%>
-		<div class="component" >
-			<%-component.value%>
-		</div>
+	<%for(index=0; index<pageObject.components.length; index++){%>
+	<%var component = pageObject.components[index]%>
+		<%if(component.type==='title'){%>
+			<h3><div class="page-header component component-title"><%-component.value%></div></h3>
+		<%}else if(component.type==='image'){%>
+			<img class="component component-image" src="<%-component.value%>" href="<%-component.value%>"/>
+		<%}else{%>
+			<div class="component component-content"><%-component.value%></div>
+		<%}%>
 	<%}%>
-<%}%>
-<hr>
-you can use pictures and texts on this site as you like.
-
+</div>
+<div class="container">
+	<hr>
+	you can use pictures and texts on this site as you like.
 </div>
 </body>
 </html>

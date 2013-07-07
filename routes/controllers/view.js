@@ -1,27 +1,19 @@
 
-var _componentsBuilder = require('./components.js');
+var _contentUtil = require('./content-utils.js');
 var _fm = require('./fileManager.js');
 
 exports.view = function(req, res){
 	_fm.getContentsFile(''+req.params, function(err, filename, txt){
 		if(err){
-			res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
+			res.render('dev_error', {message: 'Path['+filename+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
 			return;
 		}
-		var scaffold = _fm.scaffoldFromFileName(filename);
-		var components = _componentsBuilder.build(txt);
-		res.render('scaffolds/'+scaffold , {components: components.components});
+		var pageObject = _contentUtil.getPageObject(txt);
+		if(pageObject)res.render('scaffolds/'+pageObject.config.view , {pageObject: pageObject});
+		else res.render('dev_error', {message: 'cant parse ['+path+'] file', description:''+err});
 	});
 };
 
 exports.outputView = function(req, res){
-	_fm.getContentsFile(''+req.params, function(err, filename, txt){
-		if(err){
-			res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
-			return;
-		}
-		var scaffold = _fm.scaffoldFromFileName(filename);
-		var components = _componentsBuilder.build(txt);
-		res.render('scaffolds/'+scaffold , {components: components.components});
-	});
+	
 };

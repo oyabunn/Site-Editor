@@ -1,6 +1,6 @@
 {
 	"dev":{
-		
+		"path_to_static": "./public/html/"
 	},
 	"rel":{
 		
