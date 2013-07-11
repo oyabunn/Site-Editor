@@ -9,16 +9,16 @@
 	</head>
 <body>
 <div class="container">
-	<%for(index=0; index<pageObject.components.length; index++){%>
+<%for(index=0; index<pageObject.components.length; index++){%>
 	<%var component = pageObject.components[index]%>
-		<%if(component.type==='title'){%>
-			<h3><div class="page-header component component-title"><%-component.value%></div></h3>
-		<%}else if(component.type==='image'){%>
-			<img class="component component-image" src="<%-component.value%>" href="<%-component.value%>"/>
-		<%}else{%>
-			<div class="component component-content"><%-component.value%></div>
-		<%}%>
+	<%if(component.type==='title'){%>
+		<h3><div class="page-header component component-title"><%-component.value%></div></h3>
+	<%}else if(component.type==='image'){%>
+		<img class="component component-image" src="<%-component.value%>" href="<%-component.value%>"/>
+	<%}else{%>
+		<div class="component component-content"><%-component.value%></div>
 	<%}%>
+<%}%>
 </div>
 <div class="container">
 	<hr>

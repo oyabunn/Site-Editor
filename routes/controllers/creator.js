@@ -3,6 +3,7 @@ var _contentUtil = require('./content-utils.js');
 var _fm = require('./fileManager.js');
 var _path = require('path');
 var _fs = require('fs');
+var _ejs = require('ejs');
 
 exports.showEditView = function(req, res){
 	var path = ''+req.params;
@@ -44,8 +45,6 @@ var saveContent = function(path, pageObject, callback){
 	_fm.overWriteContentFile(path, pageObject, callback);
 }
 
-
-
 exports.save = function(req, res){
 	saveContent(''+req.params, req.body.page_object, function(err){
 		if(err){
@@ -56,18 +55,46 @@ exports.save = function(req, res){
 	});
 };
 
-exports.outputStatic = function(req, res){
-	var staticPath = req.config.path_to_static; // lie a "./public/html" or "/var/www/html"
-	
+var outputStatic = function(staticPath, filePath, pageObject, callback){
+	console.log('start publish static['+staticPath+'] view[./views/scaffolds/'+pageObject.config.view+'.ejs]');
+	_fs.readFile('./views/scaffolds/'+pageObject.config.view+'.ejs' , function (err, data){
+		if (err){
+			callback(err);
+			return;
+		}
+		var html = '';
+		try{
+			html = _ejs.render(''+data, {pageObject: pageObject});
+		}catch(e){
+			console.log('generate html error: '+e);
+			html = '';
+			callback(e);
+			return;
+		}
+		
+		// shrink html
+		
+		_fs.writeFile(_path.join(staticPath, filePath), html, function(err){
+			callback(err);
+		});
+	});
 };
 
 exports.publish = function(req, res){
-	saveContent(''+req.params, req.body.page_object, function(err){
+	var path = ''+req.params;
+	var pageObject = req.body.page_object;
+	saveContent(path, pageObject, function(err){
 		if(err){
 			sendSimpleResponse(res, 403, 'file write error: '+err);
 			return;
 		}
-		outputStatic(req, res);
+		outputStatic(req.config.path_to_static, path, pageObject, function(err){
+			if(err){
+				sendSimpleResponse(res, 403, 'publish error: '+err);
+				return;
+			}
+			sendSimpleResponse(res, 200, 'published');
+		});
 	});
 };
 

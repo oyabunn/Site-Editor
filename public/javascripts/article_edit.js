@@ -133,8 +133,32 @@ var saveComponents = function(){
 }
 
 var publishComponents = function(){
-	var components = getComponents();
+var components = getComponents();
 	
+	var data = {
+		page_object:{
+			config: SCPageConfig,
+			components: components
+		}
+	};
+	
+	// checks
+	if(!SCPageConfig.path || SCPageConfig.path.length==0){
+		alert('Config [path] is broken');
+		return;
+	}
+	
+	$.ajax({
+		type:	"POST",
+		url:	"/publish/"+SCPageConfig.path,
+		data:	data,
+		success: function(data) {
+				alert('Success: '+data);
+			},
+		error: function(request, status, error){
+				alert('Fail: '+error);
+			}
+		});
 }
 
 // internals
