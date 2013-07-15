@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%=title%></title>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" media="screen, projection" />
+	<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+	<script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+	<div class="container">
+	
+	<div class="page-header">
+		<h3><%=title%></h3>
+	</div>
+
+	<%if(categories.length>0){%>
+		<table class="table table-striped">
+			<thead>
+			<tr>
+				<th>Category</th>
+			</tr>
+			</thead>
+		<% for(var i=0; i<categories.length; i++){ %>
+		<% var category = categories[i]%>
+			<tr>
+				<td><a href="<%=_path.join('/manage', dir, category)%>"><%=category%></a></td>
+			</tr>
+			<% } %>
+		</table>
+	<%}%>
+
+	<%if(articles.length>0){%>
+		<table class="table table-striped">
+			<thead>
+			<tr>
+				<th>Article</th>
+			</tr>
+			</thead>
+		<% for(var i=0; i<articles.length; i++){ %>
+		<% var article = articles[i]%>
+			<tr>
+				<td><a href="<%=_path.join('/edit', dir, article+'.html')%>"><%=article%></a></td>
+			</tr>
+			<% } %>
+		</table>
+	<%}%>
+	
+	</div>
+  </body>
+</html>
