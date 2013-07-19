@@ -24,7 +24,7 @@ exports.overWriteContentFile = function(path, pageObject, callback){
 				callback(err);
 			});
 		}else{
-			
+			callback('not exist such file:'+path);
 		}
 	})
 }

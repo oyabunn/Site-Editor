@@ -7,12 +7,75 @@
 	<script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
   </head>
   <body>
+	<div id="newcategory-modal" class="modal hide">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3>New Category</h3>
+		</div>
+		<form class="form-horizontal"  action="/manage/<%=dir%>" method="post">
+			<div>
+				<center><b>
+					</br>
+					You can create new category. category name you fill in will be part of path.</br>
+					Like "http://yourpage.com/{newcategory}/index.html"</br></br>
+				</b></center>
+			</div>
+		  <div class="control-group">
+			<label class="control-label" for="newcategoryname">Category name</label>
+			<div class="controls">
+			  <input type="text" id="categoryname" name="categoryname" placeholder="Category name">
+			</div>
+		  </div>
+		<div class="control-group">
+			<div class="controls">
+				<button type="submit" class="btn btn-primary"  onClick="createNewCategory()">Create</button>
+			</div>
+		</div>
+		</form>
+	</div>
+	
+	<div id="newarticle-modal" class="modal hide">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3>New Article</h3>
+		</div>
+		<form class="form-horizontal"   action="/manage/<%=dir%>" method="post">
+			<div>
+				<center><b>
+					</br>
+					You can create new aritlce. article file name you fill in will be part of path.</br>
+					Like "http://yourpage.com/{newfilename}.html"</br></br>
+				</b></center>
+			</div>
+		  <div class="control-group">
+			<label class="control-label" for="articlefilename">File name</label>
+			<div class="controls">
+			  <input type="text" id="articlefilename" name="articlefilename" placeholder="File name">
+			</div>
+		  </div>
+		  <div class="control-group">
+			<label class="control-label" for="articletitle">Title</label>
+			<div class="controls">
+			  <input type="text" id="articletitle" name="articletitle" placeholder="Title">
+			</div>
+		  </div>
+		<div class="control-group">
+			<div class="controls">
+				<button type="submit" class="btn btn-primary"  onClick="createNewCategory()">Create</button>
+			</div>
+		</div>
+		</form>
+	</div>
+	 
 	<div class="container">
 	
 	<div class="page-header">
 		<h3><%=title%></h3>
 	</div>
-
+		
+	<button class="btn btn-large btn-primary" type="button" href="#newcategory-modal" data-toggle="modal">New Category</button>
+	<button class="btn btn-large btn-primary" type="button" href="#newarticle-modal" data-toggle="modal">New Article</button>
+	
 	<%if(categories.length>0){%>
 		<table class="table table-striped">
 			<thead>

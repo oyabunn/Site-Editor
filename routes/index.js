@@ -23,6 +23,7 @@ exports.wire = function(app)
 	
 	// manage contents
 	app.get ('/manage/*',	_manager.manage);
+	app.post('/manage/*',	_manager.create);
 };
 
 var injector = function (req, res, next){
