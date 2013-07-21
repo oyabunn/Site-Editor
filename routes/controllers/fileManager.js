@@ -15,6 +15,20 @@ exports.getContentsFile = function(path, callback){
 	});
 }
 
+//todo async
+exports.prepareDirecotoryWithCreate = function(path, callback){
+	var pathes = _path.dirname(path).split(_path.sep);
+	var currentPath = '';
+	for(var i=0; i<pathes.length; i++){
+		currentPath = _path.join(currentPath, pathes[i]);
+		if(!_fs.existsSync(currentPath)){
+			console.log('create directory' + currentPath);
+			_fs.mkdirSync(currentPath);
+		}
+	}
+	callback(null);
+}
+
 exports.overWriteContentFile = function(path, pageObject, callback){
 	path = path.replace('.html', '.json');
 	var relativePath = _path.join('./contents', path);

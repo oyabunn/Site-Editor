@@ -72,17 +72,29 @@ var outputStatic = function(staticPath, filePath, pageObject, callback){
 			return;
 		}
 		
-		// shrink html
+		var targetPath = _path.join(staticPath, filePath);
 		
-		_fs.writeFile(_path.join(staticPath, filePath), html, function(err){
-			callback(err);
-		});
+		// shrink html
+		_fm.prepareDirecotoryWithCreate(targetPath, function(err){
+			if(err){
+				callback(err);
+				return;
+			}
+			_fs.writeFile(targetPath, html, function(err){
+				callback(err);
+			});
+		})
 	});
 };
 
 exports.publish = function(req, res){
 	var path = ''+req.params;
 	var pageObject = req.body.page_object;
+	if(pageObject.config.publishable === false || pageObject.config.publishable === 'false'){
+		sendSimpleResponse(res, 403, 'this page publishable = false');
+		return;
+	}
+	
 	saveContent(path, pageObject, function(err){
 		if(err){
 			sendSimpleResponse(res, 403, 'file write error: '+err);
@@ -90,6 +102,7 @@ exports.publish = function(req, res){
 		}
 		outputStatic(req.config.path_to_static, path, pageObject, function(err){
 			if(err){
+				console.log('publisherror:'+err);
 				sendSimpleResponse(res, 403, 'publish error: '+err);
 				return;
 			}
