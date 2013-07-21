@@ -23,4 +23,5 @@ npm-debug.log
 node_modules
 contents
 .elasticbeanstalk/
+public/html/*
 public/images/*
