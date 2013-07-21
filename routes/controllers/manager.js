@@ -62,6 +62,7 @@ var createNewSite = function(req, res){
 			res.render('dev_error', {message: 'cant write __site_config.json', description:''+err});	
 			return;
 		}
+		_fs.writeFile('./contents/template.json', _template);
 		_users.addNewUser(req.body.email, req.body.password, function(err){
 			if(err){
 				res.render('dev_error', {message: 'cant add user to __site_config.json', description:''+err});	
