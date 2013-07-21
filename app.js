@@ -18,6 +18,14 @@ app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser({uploadDir:'./upload_cache'}));
 app.use(express.methodOverride());
+app.use(express.cookieParser());
+app.use(express.cookieSession({
+	secret: 'yuki-sato',
+	cookie: {
+		path: '/',
+		httpOnly: true
+	}
+}));
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -27,7 +35,7 @@ if ('development' === app.get('env')) {
 }else{
 	app.use(function(err, req, res, next){
     	console.error(err.stack);
-		res.render('general_error', {message: "解決できないエラーが発生しました。下記リンクからお問い合わせ下さい"});
+		res.render('general_error', {message: "Internal Server Error... Sorry"});
 	});
 }
 routes.wire(app);

@@ -100,43 +100,56 @@ exports.publish = function(req, res){
 			sendSimpleResponse(res, 403, 'file write error: '+err);
 			return;
 		}
-		outputStatic(req.config.path_to_static, path, pageObject, function(err){
+		_fm.getSiteConfig(function(err, configObj){
 			if(err){
-				console.log('publisherror:'+err);
-				sendSimpleResponse(res, 403, 'publish error: '+err);
+				console.log('opendir error: '+err);
+				res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
 				return;
 			}
-			sendSimpleResponse(res, 200, 'published');
+			outputStatic(configObj.path_to_static, path, pageObject, function(err){
+				if(err){
+					console.log('publisherror:'+err);
+					sendSimpleResponse(res, 403, 'publish error: '+err);
+					return;
+				}
+				sendSimpleResponse(res, 200, 'published');
+			});
 		});
 	});
 };
 
 exports.fileReceiver = function(req, res){
-	console.log(''+req.config);
     var tmp_path = req.files.uploadimage.path;
-	var staticPath = req.config.path_to_static;
     var target_path = _path.join(staticPath, 'images', req.files.uploadimage.name);
-    _fs.rename(tmp_path, target_path, function(err) {
-        if (err){
-			console.log('File uploaded failed: '+ err);
-			sendSimpleResponse(res, 403, 'File upload fail: '+err);
+	_fm.getSiteConfig(function(err, configObj){
+		if(err){
+			console.log('opendir error: '+err);
+			res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
 			return;
 		}
-        _fs.unlink(tmp_path, function() {
-            if (err){
+		var staticPath = configObj.path_to_static;
+		_fs.rename(tmp_path, target_path, function(err) {
+			if (err){
 				console.log('File uploaded failed: '+ err);
 				sendSimpleResponse(res, 403, 'File upload fail: '+err);
 				return;
 			}
-			_fs.link(target_path, _path.join('./public/images', req.files.uploadimage.name), function(err){
+			_fs.unlink(tmp_path, function() {
 				if (err){
 					console.log('File uploaded failed: '+ err);
 					sendSimpleResponse(res, 403, 'File upload fail: '+err);
 					return;
 				}
-				console.log('File uploaded to: ' + target_path + ' - ' + req.files.uploadimage.size + ' bytes');
-				sendJsonResponse(res, 200, {image_url: _path.join('/images/', req.files.uploadimage.name)});
-			})
-        });
-    });
+				_fs.link(target_path, _path.join('./public/images', req.files.uploadimage.name), function(err){
+					if (err){
+						console.log('File uploaded failed: '+ err);
+						sendSimpleResponse(res, 403, 'File upload fail: '+err);
+						return;
+					}
+					console.log('File uploaded to: ' + target_path + ' - ' + req.files.uploadimage.size + ' bytes');
+					sendJsonResponse(res, 200, {image_url: _path.join('/images/', req.files.uploadimage.name)});
+				})
+			});
+		});
+	});
 }

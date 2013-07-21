@@ -2,27 +2,7 @@
 var _fs = require('fs');
 var _path = require('path');
 var _fm = require('./fileManager.js');
-
-var getSiteConfig = function(callback){
-	_fs.readFile('./contents/__site_config.json', function(err, data){
-		if(err){
-			callback(err);
-			return;
-		}
-		
-		var configObj = null;
-		try{
-			configObj = JSON.parse(''+data);
-		}catch(e){
-			configObj = null;
-		}
-		if(!configObj){
-			callback('parseError');
-			return;
-		}
-		callback(null, configObj);
-	});
-}
+var _users = require('./users.js');
 
 var removeSystemFileInFileNames = function(files){
 	if(files.length==0)return;
@@ -47,10 +27,84 @@ var articlesInFileNames = function(files){
 	return ret;
 }
 
+exports.resCreateNew = function(req, res){
+	res.render('new_site.ejs', {});
+}
+
+exports.manageSite = function(req, res){
+	_fs.exists('./contents', function(isExist){
+		if(isExist){
+			_fm.getSiteConfig(function(err, configObj){
+				if(err){
+					// maybe not exist
+					exports.resCreateNew(req, res);
+					return;
+				}
+				res.render('manage_site', {siteConfig: configObj});
+			})
+		}else{
+			exports.resCreateNew(req, res);
+		}
+	});
+}
+
+var _template = '{"config":{"view":"article","path":"template.html","publishable":"false","css":["/bootstrap/css/bootstrap.min.css"],"js":["http://code.jquery.com/jquery.js","/bootstrap/js/bootstrap.min.js","/javascripts/article_edit.js"],"title":"Title"},"components":[{"type":"title","value":"Title"},{"type":"content","value":"text"}]}';
+
+var createNewSite = function(req, res){
+	_fs.mkdirSync('./contents');
+	
+	var configObj = {};
+	configObj.sitename = req.body.sitename;
+	configObj.path_to_static = req.body.path_to_static;
+	configObj.template = "template.json";
+	overWriteConfig(configObj, function(err){
+		if(err){
+			res.render('dev_error', {message: 'cant write __site_config.json', description:''+err});	
+			return;
+		}
+		_users.addNewUser(req.body.email, req.body.password, function(err){
+			if(err){
+				res.render('dev_error', {message: 'cant add user to __site_config.json', description:''+err});	
+				return;
+			}
+			res.redirect('/manage/');
+		})
+	});
+}
+
+var overWriteConfig = function(configObj, callback){
+	_fs.writeFile('./contents/__site_config.json', JSON.stringify(configObj), function(err){
+		callback(err);
+	})
+}
+
+exports.editSite = function(req, res){
+	if(req.body.email && req.body.password){
+		createNewSite(req, res);
+		return;
+	}
+	_fm.getSiteConfig(function(err, configObj){
+		if(err){
+			// maybe not exist
+			exports.resCreateNew(req, res);
+			return;
+		}
+		configObj.sitename = req.body.sitename;
+		configObj.path_to_static = req.body.path_to_static;
+		overWriteConfig(configObj, function(err){
+			if(err){
+				res.render('dev_error', {message: 'cant write __site_config.json', description:''+err});	
+				return;
+			}
+			res.redirect('/manage/');
+		})
+	})
+}
+
 exports.manage = function(req, res){
 	var dirPath = ''+req.params;
 	var relativePath = _path.join('./contents', dirPath);
-	getSiteConfig(function(err, configObj){
+	_fm.getSiteConfig(function(err, configObj){
 		if(err){
 			console.log('opendir error: '+err);
 			res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
@@ -75,7 +129,7 @@ exports.manage = function(req, res){
 
 exports.create = function(req, res)
 {
-	getSiteConfig(function(err, configObj){
+	_fm.getSiteConfig(function(err, configObj){
 		if(err){
 			console.log('opendir error: '+err);
 			res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	

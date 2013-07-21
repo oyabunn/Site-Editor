@@ -42,3 +42,24 @@ exports.overWriteContentFile = function(path, pageObject, callback){
 		}
 	})
 }
+
+exports.getSiteConfig = function(callback){
+	_fs.readFile('./contents/__site_config.json', function(err, data){
+		if(err){
+			callback(err);
+			return;
+		}
+		
+		var configObj = null;
+		try{
+			configObj = JSON.parse(''+data);
+		}catch(e){
+			configObj = null;
+		}
+		if(!configObj){
+			callback('parseError');
+			return;
+		}
+		callback(null, configObj);
+	});
+}

@@ -1,16 +1,17 @@
 
-var _config;
 var _path = require('path');
 
 var _view =		require('./controllers/view.js');
 var _creator =	require('./controllers/creator.js');
 var _manager =	require('./controllers/manager.js');
-
+var _users	=	require('./controllers/users.js');
 
 exports.wire = function(app)
 {
-	_config = require('../config/config.js').getConfig('dev');
-	app.all ('/*', injector);
+	// admin
+	app.post('/login',		_users.login);
+	
+	app.all ('/*',			injector);
 	
 	// view contents
 	app.get ('/view/*',		_view.view);
@@ -24,9 +25,14 @@ exports.wire = function(app)
 	// manage contents
 	app.get ('/manage/*',	_manager.manage);
 	app.post('/manage/*',	_manager.create);
+	app.get ('/manage',		_manager.manageSite);
+	app.post('/manage',		_manager.editSite);
 };
 
 var injector = function (req, res, next){
-	req.config = _config;
-	next();
+	if(_users.isAcceptedRequestAsAdmin(req)){
+		next();
+	}else{
+		_users.showLoginForm(req, res);
+	}
 };

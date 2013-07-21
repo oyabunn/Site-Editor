@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" />
+	<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+	<script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+	<div class="container">
+	<div class="page-header">
+		<h3>Welco....Who are you?</h3>
+	</div>
+	
+	<div class="well">
+    <form id="loginform" action="/login" method="post">
+        <div>
+            <input type="text" id="email" name="email" placeholder="Email" required />
+        </div>
+        <div>
+            <input type="password" id="password" name="password" placeholder="Password" required />
+        </div>
+  		<input class="btn btn-primary" type="submit" value="Login" />
+	</form>
+	</div>
+	</div>
+  </body>
+</html>
