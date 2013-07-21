@@ -30,9 +30,16 @@ exports.wire = function(app)
 };
 
 var injector = function (req, res, next){
-	if(_users.isAcceptedRequestAsAdmin(req)){
-		next();
-	}else{
-		_users.showLoginForm(req, res);
-	}
+	
+	_manager.isSiteEmpty(function(isEmpty){
+		if(isEmpty){
+			next();
+		}else{
+			if(_users.isAcceptedRequestAsAdmin(req)){
+				next();
+			}else{
+				_users.showLoginForm(req, res);
+			}
+		}	
+	})
 };

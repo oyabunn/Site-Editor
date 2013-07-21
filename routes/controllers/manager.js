@@ -78,6 +78,16 @@ var overWriteConfig = function(configObj, callback){
 	})
 }
 
+exports.isSiteEmpty = function(callback){
+	_fm.getSiteConfig(function(err, configObj){
+		if(err){
+			callback(true);
+			return;
+		}
+		callback(false);
+	})
+}
+
 exports.editSite = function(req, res){
 	if(req.body.email && req.body.password){
 		createNewSite(req, res);

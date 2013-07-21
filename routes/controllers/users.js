@@ -2,6 +2,7 @@ var _crypto = require('crypto');
 var _moment = require('moment');
 var _fm = require('./fileManager.js');
 var _manager = require('./manager.js');
+var _fs = require('fs');
 
 var _secretWord = null;
 
