@@ -7,6 +7,7 @@ var _ejs = require('ejs');
 
 exports.showEditView = function(req, res){
 	var path = ''+req.params;
+	console.log('here:path:'+path);
 	_fm.getContentsFile(path, function(err, filename, txt){
 		if(err){
 			res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
@@ -14,7 +15,7 @@ exports.showEditView = function(req, res){
 		}
 		
 		var pageObject = _contentUtil.getPageObject(txt);
-		if(pageObject)res.render('editor/'+pageObject.config.view , {pageObject: pageObject});
+		if(pageObject)res.render('editor/'+pageObject.config.view , {pageObject: pageObject, pagePath:path});
 		else res.render('dev_error', {message: 'cant parse ['+path+'] file', description:''+err});
 	});
 };

@@ -114,14 +114,14 @@ var saveComponents = function(){
 	};
 	
 	// checks
-	if(!SCPageConfig.path || SCPageConfig.path.length==0){
-		alert('Config [path] is broken');
+	if(!SCPagePath || SCPagePath.length==0){
+		alert('[path] is broken');
 		return;
 	}
 	
 	$.ajax({
 		type:	"POST",
-		url:	"/save/"+SCPageConfig.path,
+		url:	"/save/"+SCPagePath,
 		data:	data,
 		success: function(data) {
 				alert('Success: '+data);
@@ -143,14 +143,14 @@ var components = getComponents();
 	};
 	
 	// checks
-	if(!SCPageConfig.path || SCPageConfig.path.length==0){
-		alert('Config [path] is broken');
+	if(!SCPagePath || SCPagePath.length==0){
+		alert('[path] is broken');
 		return;
 	}
 	
 	$.ajax({
 		type:	"POST",
-		url:	"/publish/"+SCPageConfig.path,
+		url:	"/publish/"+SCPagePath,
 		data:	data,
 		success: function(data) {
 				alert('Success: '+data);
