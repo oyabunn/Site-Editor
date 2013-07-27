@@ -184,7 +184,6 @@ exports.create = function(req, res)
 				}
 				templateObject.config.title = req.body.articletitle;
 				templateObject.config.publishable = true;
-				templateObject.config.path = _path.join(requestedPath, filebasename+'.html');
 				_fs.exists(relativePath, function(isExist){
 					if(isExist){
 						res.render('dev_error', {message: 'requested article is already exist', description:''});
