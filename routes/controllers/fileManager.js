@@ -43,6 +43,20 @@ exports.overWriteContentFile = function(path, pageObject, callback){
 	})
 }
 
+exports.deleteContentFile = function(path, callback){
+	path = path.replace('.html', '.json');
+	var relativePath = _path.join('./contents', path);
+	_fs.exists(relativePath, function(isExist){
+		if(isExist){
+			_fs.unlink(relativePath, function(err){
+				callback(err);
+			});
+		}else{
+			callback('not exist such file:'+path);
+		}
+	})
+}
+
 exports.getSiteConfig = function(callback){
 	_fs.readFile('./contents/__site_config.json', function(err, data){
 		if(err){

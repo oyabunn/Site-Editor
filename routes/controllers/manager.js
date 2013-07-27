@@ -122,7 +122,6 @@ exports.manage = function(req, res){
 			return;
 		}
 		_fs.readdir(relativePath, function(err, files){
-			for(var key in files)console.log('file: '+files[key]);
 			if(err){
 				console.log('opendir error: '+err);
 				res.render('dev_error', {message: 'Path['+dirPath+'] cant open this。 no directory or invalid permission', description:''+err});
@@ -203,4 +202,33 @@ exports.create = function(req, res)
 			res.render('dev_error', {message: 'Path['+requestedPath+'] is not category or article', description:''});
 		}
 	});
+}
+
+exports.deleteContent = function(req, res){
+	var requestedPath = ''+req.params;
+	var relativePath = _path.join('./contents', requestedPath);
+	var isDirectory = (_path.extname(relativePath).length==0)
+	if(isDirectory){
+		console.log('try delete directory :'+relativePath);
+		_fs.rmdir(relativePath, function(err){
+			if(err){
+				res.render('dev_error', {message: 'Path['+requestedPath+'] cant delete', description:''+err});
+				return;
+			}
+			var parentPath = _path.dirname(requestedPath);
+			if(!parentPath || parentPath.length==0 || parentPath ==='.')res.redirect('/manage/');
+			else res.redirect(_path.join('/manage', parentPath));
+		})
+	}else{
+		console.log('try delete file :'+relativePath);
+		_fm.deleteContentFile(requestedPath, function(err){
+			if(err){
+				res.render('dev_error', {message: 'Path['+requestedPath+'] cant delete', description:''+err});
+				return;
+			}
+			var parentPath = _path.dirname(requestedPath);
+			if(!parentPath || parentPath.length==0 || parentPath ==='.')res.redirect('/manage/');
+			else res.redirect(_path.join('/manage', parentPath));
+		})
+	}
 }

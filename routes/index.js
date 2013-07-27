@@ -25,6 +25,7 @@ exports.wire = function(app)
 	app.post('/manage/*',	injector, _manager.create);
 	app.get ('/manage',		injector, _manager.manageSite);
 	app.post('/manage',		injector, _manager.editSite);
+	app.get ('/delete/*',	injector, _manager.deleteContent);
 };
 
 var injector = function (req, res, next){
