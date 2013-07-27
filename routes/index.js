@@ -11,22 +11,20 @@ exports.wire = function(app)
 	// admin
 	app.post('/login',		_users.login);
 	
-	app.all ('/*',			injector);
-	
 	// view contents
-	app.get ('/view/*',		_view.view);
+	app.get ('/view/*',		injector, _view.view);
 	
 	// edit contents
-	app.get ('/edit/*',		_creator.showEditView);
-	app.post('/save/*',		_creator.save);
-	app.post('/publish/*',	_creator.publish);
-	app.post('/upload',		_creator.fileReceiver);
+	app.get ('/edit/*',		injector, _creator.showEditView);
+	app.post('/save/*',		injector, _creator.save);
+	app.post('/publish/*',	injector, _creator.publish);
+	app.post('/upload',		injector, _creator.fileReceiver);
 	
 	// manage contents
-	app.get ('/manage/*',	_manager.manage);
-	app.post('/manage/*',	_manager.create);
-	app.get ('/manage',		_manager.manageSite);
-	app.post('/manage',		_manager.editSite);
+	app.get ('/manage/*',	injector, _manager.manage);
+	app.post('/manage/*',	injector, _manager.create);
+	app.get ('/manage',		injector, _manager.manageSite);
+	app.post('/manage',		injector, _manager.editSite);
 };
 
 var injector = function (req, res, next){
