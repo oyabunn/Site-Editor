@@ -13,12 +13,78 @@ exports.showEditView = function(req, res){
 			res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
 			return;
 		}
-		
+
 		var pageObject = _contentUtil.getPageObject(txt);
 		if(pageObject)res.render('editor/'+pageObject.config.view , {pageObject: pageObject, pagePath:path});
 		else res.render('dev_error', {message: 'cant parse ['+path+'] file', description:''+err});
 	});
 };
+
+exports.publish = function(req, res){
+	var path = ''+req.params;
+	var pageObject = req.body.page_object;
+	if(pageObject.config.publishable === false || pageObject.config.publishable === 'false'){
+		sendSimpleResponse(res, 403, 'this page publishable = false');
+		return;
+	}
+	saveContent(path, pageObject, function(err){
+		if(err){
+			sendSimpleResponse(res, 403, 'file write error: '+err);
+			return;
+		}
+		_fm.getSiteConfig(function(err, configObj){
+			if(err){
+				console.log('opendir error: '+err);
+				res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
+				return;
+			}
+			outputStatic(configObj.path_to_static, path, pageObject, function(err){
+				if(err){
+					console.log('publisherror:'+err);
+					sendSimpleResponse(res, 403, 'publish error: '+err);
+					return;
+				}
+				sendSimpleResponse(res, 200, 'published');
+			});
+		});
+	});
+};
+
+exports.fileReceiver = function(req, res){
+    var tmp_path = req.files.uploadimage.path;
+    var target_path = _path.join(staticPath, 'images', req.files.uploadimage.name);
+	_fm.getSiteConfig(function(err, configObj){
+		if(err){
+			console.log('opendir error: '+err);
+			res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
+			return;
+		}
+		var staticPath = configObj.path_to_static;
+		_fs.rename(tmp_path, target_path, function(err) {
+			if (err){
+				console.log('File uploaded failed: '+ err);
+				sendSimpleResponse(res, 403, 'File upload fail: '+err);
+				return;
+			}
+			_fs.unlink(tmp_path, function() {
+				if (err){
+					console.log('File uploaded failed: '+ err);
+					sendSimpleResponse(res, 403, 'File upload fail: '+err);
+					return;
+				}
+				_fs.link(target_path, _path.join('./public/images', req.files.uploadimage.name), function(err){
+					if (err){
+						console.log('File uploaded failed: '+ err);
+						sendSimpleResponse(res, 403, 'File upload fail: '+err);
+						return;
+					}
+					console.log('File uploaded to: ' + target_path + ' - ' + req.files.uploadimage.size + ' bytes');
+					sendJsonResponse(res, 200, {image_url: _path.join('/images/', req.files.uploadimage.name)});
+				})
+			});
+		});
+	});
+}
 
 var sendSimpleResponse = function(res, status, text){
 	res.statusCode = status;
@@ -88,69 +154,3 @@ var outputStatic = function(staticPath, filePath, pageObject, callback){
 	});
 };
 
-exports.publish = function(req, res){
-	var path = ''+req.params;
-	var pageObject = req.body.page_object;
-	if(pageObject.config.publishable === false || pageObject.config.publishable === 'false'){
-		sendSimpleResponse(res, 403, 'this page publishable = false');
-		return;
-	}
-	
-	saveContent(path, pageObject, function(err){
-		if(err){
-			sendSimpleResponse(res, 403, 'file write error: '+err);
-			return;
-		}
-		_fm.getSiteConfig(function(err, configObj){
-			if(err){
-				console.log('opendir error: '+err);
-				res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
-				return;
-			}
-			outputStatic(configObj.path_to_static, path, pageObject, function(err){
-				if(err){
-					console.log('publisherror:'+err);
-					sendSimpleResponse(res, 403, 'publish error: '+err);
-					return;
-				}
-				sendSimpleResponse(res, 200, 'published');
-			});
-		});
-	});
-};
-
-exports.fileReceiver = function(req, res){
-    var tmp_path = req.files.uploadimage.path;
-    var target_path = _path.join(staticPath, 'images', req.files.uploadimage.name);
-	_fm.getSiteConfig(function(err, configObj){
-		if(err){
-			console.log('opendir error: '+err);
-			res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
-			return;
-		}
-		var staticPath = configObj.path_to_static;
-		_fs.rename(tmp_path, target_path, function(err) {
-			if (err){
-				console.log('File uploaded failed: '+ err);
-				sendSimpleResponse(res, 403, 'File upload fail: '+err);
-				return;
-			}
-			_fs.unlink(tmp_path, function() {
-				if (err){
-					console.log('File uploaded failed: '+ err);
-					sendSimpleResponse(res, 403, 'File upload fail: '+err);
-					return;
-				}
-				_fs.link(target_path, _path.join('./public/images', req.files.uploadimage.name), function(err){
-					if (err){
-						console.log('File uploaded failed: '+ err);
-						sendSimpleResponse(res, 403, 'File upload fail: '+err);
-						return;
-					}
-					console.log('File uploaded to: ' + target_path + ' - ' + req.files.uploadimage.size + ' bytes');
-					sendJsonResponse(res, 200, {image_url: _path.join('/images/', req.files.uploadimage.name)});
-				})
-			});
-		});
-	});
-}

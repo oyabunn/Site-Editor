@@ -193,6 +193,7 @@ exports.create = function(req, res)
 								return;
 							}
 							console.log('created new article['+relativePath+']');
+							requestedPath = requestedPath.replace('.json', '.html');
 							res.redirect(_path.join('/edit', requestedPath, req.body.articlefilename));
 						})
 					}
@@ -210,6 +211,7 @@ exports.deleteContent = function(req, res){
 	var isDirectory = (_path.extname(relativePath).length==0)
 	if(isDirectory){
 		console.log('try delete directory :'+relativePath);
+		// TODO
 		_fs.rmdir(relativePath, function(err){
 			if(err){
 				res.render('dev_error', {message: 'Path['+requestedPath+'] cant delete', description:''+err});
@@ -221,14 +223,26 @@ exports.deleteContent = function(req, res){
 		})
 	}else{
 		console.log('try delete file :'+relativePath);
-		_fm.deleteContentFile(requestedPath, function(err){
+		_fm.getSiteConfig(function(err, configObj){
 			if(err){
-				res.render('dev_error', {message: 'Path['+requestedPath+'] cant delete', description:''+err});
+				console.log('opendir error: '+err);
+				res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
 				return;
 			}
-			var parentPath = _path.dirname(requestedPath);
-			if(!parentPath || parentPath.length==0 || parentPath ==='.')res.redirect('/manage/');
-			else res.redirect(_path.join('/manage', parentPath));
-		})
+			
+			var staticHtmlPath = _path.join(configObj.path_to_static, requestedPath);
+			_fs.unlink(staticHtmlPath, function(err){
+				// ignore error. it is possible just .json file(not published)
+					_fm.deleteContentFile(requestedPath, function(err){
+					if(err){
+						res.render('dev_error', {message: 'Path['+requestedPath+'] cant delete', description:''+err});
+						return;
+					}
+					var parentPath = _path.dirname(requestedPath);
+					if(!parentPath || parentPath.length==0 || parentPath ==='.')res.redirect('/manage/');
+					else res.redirect(_path.join('/manage', parentPath));
+				})
+			})
+		});
 	}
 }
