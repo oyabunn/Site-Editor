@@ -23,6 +23,7 @@ var articlesInFileNames = function(files){
 	var ret = [];
 	for(var i=0; i<files.length; i++){
 		if(_path.extname(files[i])==='.json')ret.push(_path.basename(files[i], '.json'));
+		else if(_path.extname(files[i])==='.html')ret.push(files[i]);
 	}
 	return ret;
 }
@@ -48,7 +49,7 @@ exports.manageSite = function(req, res){
 	});
 }
 
-var _template = '{"config":{"view":"article","path":"template.html","publishable":"false","css":["/bootstrap/css/bootstrap.min.css"],"js":["http://code.jquery.com/jquery.js","/bootstrap/js/bootstrap.min.js","/javascripts/article_edit.js"],"title":"Title"},"components":[{"type":"title","value":"Title"},{"type":"content","value":"text"}]}';
+var _template = '{"config":{"view":"article","path":"template.html","publishable":"false","css":["/bootstrap/css/bootstrap.min.css"],"js":["http://code.jquery.com/jquery.js","/bootstrap/js/bootstrap.min.js"],"title":"Title"},"components":[{"type":"title","value":"Title"},{"type":"content","value":"text"}]}';
 
 var createNewSite = function(req, res){
 	_fs.mkdirSync('./contents');
@@ -193,7 +194,7 @@ exports.create = function(req, res)
 								return;
 							}
 							console.log('created new article['+relativePath+']');
-							requestedPath = requestedPath.replace('.json', '.html');
+							requestedPath = requestedPath.replace('.json', '');
 							res.redirect(_path.join('/edit', requestedPath, req.body.articlefilename));
 						})
 					}

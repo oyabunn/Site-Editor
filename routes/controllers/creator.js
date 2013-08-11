@@ -5,51 +5,15 @@ var _path = require('path');
 var _fs = require('fs');
 var _ejs = require('ejs');
 
-exports.showEditView = function(req, res){
-	var path = ''+req.params;
-	console.log('here:path:'+path);
-	_fm.getContentsFile(path, function(err, filename, txt){
-		if(err){
-			res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
-			return;
-		}
+var isArticlePath = function(path){
+	return (_path.extname(path)==='');
+}
 
-		var pageObject = _contentUtil.getPageObject(txt);
-		if(pageObject)res.render('editor/'+pageObject.config.view , {pageObject: pageObject, pagePath:path});
-		else res.render('dev_error', {message: 'cant parse ['+path+'] file', description:''+err});
-	});
-};
+var isHtmlPath = function(path){
+	return (_path.extname(path)==='.html');
+}
 
-exports.publish = function(req, res){
-	var path = ''+req.params;
-	var pageObject = req.body.page_object;
-	if(pageObject.config.publishable === false || pageObject.config.publishable === 'false'){
-		sendSimpleResponse(res, 403, 'this page publishable = false');
-		return;
-	}
-	saveContent(path, pageObject, function(err){
-		if(err){
-			sendSimpleResponse(res, 403, 'file write error: '+err);
-			return;
-		}
-		_fm.getSiteConfig(function(err, configObj){
-			if(err){
-				console.log('opendir error: '+err);
-				res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
-				return;
-			}
-			outputStatic(configObj.path_to_static, path, pageObject, function(err){
-				if(err){
-					console.log('publisherror:'+err);
-					sendSimpleResponse(res, 403, 'publish error: '+err);
-					return;
-				}
-				sendSimpleResponse(res, 200, 'published');
-			});
-		});
-	});
-};
-
+// image receiver
 exports.fileReceiver = function(req, res){
     var tmp_path = req.files.uploadimage.path;
     var target_path = _path.join(staticPath, 'images', req.files.uploadimage.name);
@@ -86,6 +50,175 @@ exports.fileReceiver = function(req, res){
 	});
 }
 
+exports.view = function(req, res){
+	var path = ''+req.params;
+	console.log('here:path:'+path+':'+_path.extname(path));
+	
+	if(isArticlePath(path)){
+		// read json
+		_fm.getArticleContentsFile(path, function(err, txt){
+			if(err){
+				res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
+				return;
+			}
+
+			var pageObject = _contentUtil.getPageObject(txt);
+			if(pageObject)res.render('scaffolds/'+pageObject.config.view , {pageObject: pageObject, pagePath:path});
+			else res.render('dev_error', {message: 'cant parse ['+path+'] file', description:''+err});
+		});
+	}else if(isHtmlPath(path)){
+		_fm.getHtmlContentsFile(path, function(err, txt){
+			if(err){
+				res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
+				return;
+			}
+			res.render('scaffolds/html' , {code: txt, pagePath:path});
+		});
+	}else{
+		// unknown
+		res.render('dev_error', {message: 'Path['+path+']is not either html and articlefile', description:''});
+	}
+};
+
+exports.showEditView = function(req, res){
+	var path = ''+req.params;
+	console.log('here:path:'+path+':'+_path.extname(path));
+	
+	if(isArticlePath(path)){
+		// read json
+		_fm.getArticleContentsFile(path, function(err, txt){
+			if(err){
+				res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
+				return;
+			}
+
+			var pageObject = _contentUtil.getPageObject(txt);
+			if(pageObject)res.render('editor/'+pageObject.config.view , {pageObject: pageObject, pagePath:path});
+			else res.render('dev_error', {message: 'cant parse ['+path+'] file', description:''+err});
+		});
+	}else if(isHtmlPath(path)){
+		_fm.getHtmlContentsFile(path, function(err, txt){
+			if(err){
+				res.render('dev_error', {message: 'Path['+path+']のファイルが開けませんでした。ファイルがないかpermissionがおかしいです', description:''+err});
+				return;
+			}
+			res.render('editor/html' , {code: txt, pagePath:path});
+		});
+	}else{
+		// unknown
+		res.render('dev_error', {message: 'Path['+path+']is not either html and articlefile', description:''});
+	}
+};
+
+exports.publish = function(req, res){
+	var path = ''+req.params;
+	
+	if(isArticlePath(path)){
+		var pageObject = req.body.page_object;
+		if(pageObject.config.publishable === false || pageObject.config.publishable === 'false'){
+			sendSimpleResponse(res, 403, 'this page publishable = false');
+			return;
+		}
+		publishArticle(res, path, pageObject);
+	}else if(isHtmlPath(path)){
+		publishHtml(res, path, req.body.code);
+	}else{
+		res.render('dev_error', {message: 'Path['+path+']is not either html and articlefile', description:''});
+	}
+};
+
+var publishArticle = function(res, path, pageObject){
+	saveArticleContent(path, pageObject, function(err){
+		if(err){
+			sendSimpleResponse(res, 403, 'file write error: '+err);
+			return;
+		}
+		_fm.getSiteConfig(function(err, configObj){
+			if(err){
+				console.log('opendir error: '+err);
+				res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
+				return;
+			}
+			outputStatic(configObj.path_to_static, path, pageObject, function(err){
+				if(err){
+					console.log('publisherror:'+err);
+					sendSimpleResponse(res, 403, 'publish error: '+err);
+					return;
+				}
+				sendSimpleResponse(res, 200, 'published');
+			});
+		});
+	});
+}
+
+var publishHtml = function(res, path, code){
+	_fm.overWriteHtmlContentFile(path, code, function(err){
+		if(err){
+			sendSimpleResponse(res, 403, 'file write error: '+err);
+			return;
+		}
+		console.log('before output static');
+		_fm.getSiteConfig(function(err, configObj){
+			if(err){
+				console.log('opendir error: '+err);
+				res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
+				return;
+			}
+			outputStatic(configObj.path_to_static, path, code, function(err){
+				if(err){
+					console.log('publisherror:'+err);
+					sendSimpleResponse(res, 403, 'publish error: '+err);
+					return;
+				}
+				sendSimpleResponse(res, 200, 'published');
+			});
+		});
+	})
+}
+
+var outputStatic = function(staticPath, filePath, content, callback){
+	if(isHtmlPath(filePath)){
+		var targetPath = _path.join(staticPath, filePath);
+		_fm.prepareDirecotoryWithCreate(targetPath, function(err){
+			if(err){
+				callback(err);
+				return;
+			}
+			_fs.writeFile(targetPath, content, function(err){
+				callback(err);
+			});
+		})
+		return;
+	}
+	_fs.readFile('./views/scaffolds/'+content.config.view+'.ejs' , function (err, data){
+		if (err){
+			callback(err);
+			return;
+		}
+		var html = '';
+		try{
+			html = _ejs.render(''+data, {pageObject: content});
+		}catch(e){
+			console.log('generate html error: '+e);
+			html = '';
+			callback(e);
+			return;
+		}
+		var targetPath = _path.join(staticPath, filePath+'.html');
+		
+		// shrink html
+		_fm.prepareDirecotoryWithCreate(targetPath, function(err){
+			if(err){
+				callback(err);
+				return;
+			}
+			_fs.writeFile(targetPath, html, function(err){
+				callback(err);
+			});
+		})
+	});
+};
+
 var sendSimpleResponse = function(res, status, text){
 	res.statusCode = status;
 	res.setHeader('Content-Type', 'text/plain');
@@ -100,7 +233,7 @@ var sendJsonResponse = function(res, status, obj){
 	res.end();
 }
 
-var saveContent = function(path, pageObject, callback){
+var saveArticleContent = function(path, pageObject, callback){
 	if(!path || path.length===0){
 		callback('path error :'+path);
 		return;
@@ -109,48 +242,31 @@ var saveContent = function(path, pageObject, callback){
 		callback('error: you sent incorrect object');
 		return;
 	}
-	_fm.overWriteContentFile(path, pageObject, callback);
+	_fm.overWriteArticleContentFile(path, pageObject, callback);
 }
 
 exports.save = function(req, res){
-	saveContent(''+req.params, req.body.page_object, function(err){
-		if(err){
-			sendSimpleResponse(res, 403, 'file write error: '+err);
-			return;
-		}
-		sendSimpleResponse(res, 200, 'Saved!');
-	});
-};
-
-var outputStatic = function(staticPath, filePath, pageObject, callback){
-	console.log('start publish static['+staticPath+'] view[./views/scaffolds/'+pageObject.config.view+'.ejs]');
-	_fs.readFile('./views/scaffolds/'+pageObject.config.view+'.ejs' , function (err, data){
-		if (err){
-			callback(err);
-			return;
-		}
-		var html = '';
-		try{
-			html = _ejs.render(''+data, {pageObject: pageObject});
-		}catch(e){
-			console.log('generate html error: '+e);
-			html = '';
-			callback(e);
-			return;
-		}
-		
-		var targetPath = _path.join(staticPath, filePath);
-		
-		// shrink html
-		_fm.prepareDirecotoryWithCreate(targetPath, function(err){
+	var path = ""+req.params;
+	if(isArticlePath(path)){
+		saveArticleContent(path, req.body.page_object, function(err){
 			if(err){
-				callback(err);
+				sendSimpleResponse(res, 403, 'file write error: '+err);
 				return;
 			}
-			_fs.writeFile(targetPath, html, function(err){
-				callback(err);
-			});
+			sendSimpleResponse(res, 200, 'Saved!');
+		});
+	}else if(isHtmlPath(path)){
+		_fm.overWriteHtmlContentFile(path, req.body.code, function(err){
+			if(err){
+				sendSimpleResponse(res, 403, 'file write error: '+err);
+				return;
+			}
+			sendSimpleResponse(res, 200, 'Saved!');
 		})
-	});
+	}else{
+		sendSimpleResponse(res, 403, 'not either html and json');
+	}
 };
+
+
 

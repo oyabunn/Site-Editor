@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>  
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script type="text/javascript" src="/javascripts/html_edit.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+		<script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css">
+		<title>Edit a HTML</title>
+		<script type="text/javascript">
+			var SCPagePath = "<%-pagePath%>";
+		</script>
+	</head>
+<body>
+
+<ul class="nav nav-tabs nav-stacked" style="position:fixed; top:50px; right:0px;">
+  <li>
+    <a onclick="saveCode()">Just Save</a>
+  </li>
+  <li>
+    <a onclick="publishCode()">Publish</a>
+  </li>
+</ul>
+	
+<div id="editspace" class="container">
+	<div contenteditable=true>
+		<pre><code id="codespace"><%=code%></code></pre>
+	</div>
+</div>
+</body>
+</html>

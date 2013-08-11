@@ -1,7 +1,6 @@
 
 var _path = require('path');
 
-var _view =		require('./controllers/view.js');
 var _creator =	require('./controllers/creator.js');
 var _manager =	require('./controllers/manager.js');
 var _users	=	require('./controllers/users.js');
@@ -12,7 +11,7 @@ exports.wire = function(app)
 	app.post('/login',		_users.login);
 	
 	// view contents
-	app.get ('/view/*',		injector, _view.view);
+	app.get ('/view/*',		injector, _creator.view);
 	
 	// edit contents
 	app.get ('/edit/*',		injector, _creator.showEditView);

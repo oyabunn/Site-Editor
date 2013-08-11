@@ -2,8 +2,8 @@
 var _fs = require('fs');
 var _path = require('path');
 
-exports.getContentsFile = function(path, callback){
-	path = path.replace('.html', '.json');
+exports.getArticleContentsFile = function(path, callback){
+	path += '.json';
 	var relativePath = _path.join('./contents', path);
 	_fs.readFile(relativePath , function (err, txtObj){
 		var txt = ''+txtObj;
@@ -11,7 +11,19 @@ exports.getContentsFile = function(path, callback){
 			callback(err);
 			return;
 		}
-		callback(null, _path.basename(path), txt);
+		callback(null, txt);
+	});
+}
+
+exports.getHtmlContentsFile = function(path, callback){
+	var relativePath = _path.join('./contents', path);
+	_fs.readFile(relativePath , function (err, txtObj){
+		var txt = ''+txtObj;
+		if (err){
+			callback(err);
+			return;
+		}
+		callback(null, txt);
 	});
 }
 
@@ -29,12 +41,26 @@ exports.prepareDirecotoryWithCreate = function(path, callback){
 	callback(null);
 }
 
-exports.overWriteContentFile = function(path, pageObject, callback){
-	path = path.replace('.html', '.json');
+exports.overWriteArticleContentFile = function(path, pageObject, callback){
+	path += '.json';
 	var relativePath = _path.join('./contents', path);
 	_fs.exists(relativePath, function(isExist){
 		if(isExist){
 			_fs.writeFile(relativePath, JSON.stringify(pageObject), function(err){
+				callback(err);
+			});
+		}else{
+			callback('not exist such file:'+path);
+		}
+	})
+}
+
+exports.overWriteHtmlContentFile = function(path, code, callback){
+	var relativePath = _path.join('./contents', path);
+	console.log('relative:'+relativePath);
+	_fs.exists(relativePath, function(isExist){
+		if(isExist){
+			_fs.writeFile(relativePath, code, function(err){
 				callback(err);
 			});
 		}else{
