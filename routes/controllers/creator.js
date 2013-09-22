@@ -16,14 +16,13 @@ var isHtmlPath = function(path){
 // image receiver
 exports.fileReceiver = function(req, res){
     var tmp_path = req.files.uploadimage.path;
-    var target_path = _path.join(staticPath, 'images', req.files.uploadimage.name);
 	_fm.getSiteConfig(function(err, configObj){
 		if(err){
 			console.log('opendir error: '+err);
 			res.render('dev_error', {message: 'cant find __site_config.json', description:''+err});	
 			return;
 		}
-		var staticPath = configObj.path_to_static;
+		var target_path = _path.join(configObj.path_to_static, 'images', req.files.uploadimage.name);
 		_fs.rename(tmp_path, target_path, function(err) {
 			if (err){
 				console.log('File uploaded failed: '+ err);
