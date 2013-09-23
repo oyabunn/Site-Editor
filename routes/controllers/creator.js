@@ -28,23 +28,35 @@ exports.fileReceiver = function(req, res){
 			_fs.mkdirSync(imageDirPath);
 		}
 		
+		var pubImageDirPath = _path.join('public', 'images');
+		if(!_fs.existsSync(pubImageDirPath)){
+			_fs.mkdirSync(pubImageDirPath);
+		}
+		
 		var targetPath = _path.join(imageDirPath, req.files.uploadimage.name);
-		_fs.link(tmp_path, targetPath, function(err) {
+		_fs.link(tmp_path, _path.join(pubImageDirPath, req.files.uploadimage.name), function(err){
 			if (err){
-				console.log('File uploaded link failed: '+ err);
+				console.log('File uploaded link1 failed: '+ err);
 				sendSimpleResponse(res, 403, 'File upload fail: '+err);
 				return;
 			}
-			_fs.unlink(tmp_path, function() {
+			_fs.link(tmp_path, targetPath, function(err) {
 				if (err){
-					console.log('File uploaded unlink failed: '+ err);
+					console.log('File uploaded link2 failed: '+ err);
 					sendSimpleResponse(res, 403, 'File upload fail: '+err);
 					return;
 				}
-				console.log('File uploaded to: ' + targetPath + ' - ' + req.files.uploadimage.size + ' bytes');
-				sendJsonResponse(res, 200, {image_url: _path.join('/images/', req.files.uploadimage.name)});
+				_fs.unlink(tmp_path, function() {
+					if (err){
+						console.log('File uploaded unlink failed: '+ err);
+						sendSimpleResponse(res, 403, 'File upload fail: '+err);
+						return;
+					}
+					console.log('File uploaded to: ' + targetPath + ' - ' + req.files.uploadimage.size + ' bytes');
+					sendJsonResponse(res, 200, {image_url: _path.join('/images/', req.files.uploadimage.name)});
+				});
 			});
-		});
+		})
 	});
 }
 
