@@ -49,7 +49,7 @@ exports.manageSite = function(req, res){
 	});
 }
 
-var _template = '{"config":{"view":"article","path":"template.html","publishable":"false","css":["/bootstrap/css/bootstrap.min.css"],"js":["http://code.jquery.com/jquery.js","/bootstrap/js/bootstrap.min.js"],"title":"Title"},"components":[{"type":"title","value":"Title"},{"type":"content","value":"text"}]}';
+var _template = '{"config":{"view":"article","path":"template.html","publishable":"false","css":["https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"],"js":["http://code.jquery.com/jquery.js","https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"],"title":"Title"},"components":[{"type":"title","value":"Title"},{"type":"content","value":"text"}]}';
 
 var createNewSite = function(req, res){
 	_fs.mkdirSync('./contents');

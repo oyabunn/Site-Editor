@@ -68,25 +68,13 @@
 	</div>
 </div>
 
-<ul class="nav nav-tabs nav-stacked" style="position:fixed; top:50px; right:0px;">
-  <li>
-    <a href="#">Config</a>
-  </li>
-  <li>
-    <a onclick="appendComponent('title')">Add Title</a>
-  </li>
-  <li>
-    <a onclick="appendComponent('content')">Add Text</a>
-  </li>
-  <li>
-    <a href="#upload-modal" role="button" data-toggle="modal">Add Image</a>
-  </li>
-  <li>
-    <a onclick="saveComponents()">Just Save</a>
-  </li>
-  <li>
-    <a onclick="publishComponents()">Publish</a>
-  </li>
+<ul class="list-group" style="position:fixed; top:50px; right:-4px;">
+    <a class="list-group-item" href="#">Config</a>
+    <a class="list-group-item" onclick="appendComponent('title')">Add Title</a>
+    <a class="list-group-item" onclick="appendComponent('content')">Add Text</a>
+    <a class="list-group-item" href="#upload-modal" role="button" data-toggle="modal">Add Image</a>
+    <a class="list-group-item" onclick="saveComponents()">Just Save</a>
+    <a class="list-group-item" onclick="publishComponents()">Publish</a>
 </ul>
 	
 <div id="editspace" class="container">
